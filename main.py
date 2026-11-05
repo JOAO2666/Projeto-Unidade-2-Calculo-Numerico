@@ -129,12 +129,33 @@ def gauss_seidel(A: list, b: list, tol: float = 0.0001, max_iter: int = 1000) ->
 # ==============================================================================
 
 def regra_trapezio_repetida(h: float, y: list) -> float:
-    pass
+    if(h <= 0 or len(y) < 2):
+        raise ValueError("Informe uma passo positivo e pelo menos dois valores de y.")
+
+    area_total = 0.0
+
+    # Cada par de pontos consecutivos define um intervalo de integração 
+    for i in range(len(y) - 1):
+        area_trecho = (y[i] + y[i + 1]) * h / 2
+        area_total = area_total + area_trecho
+
+    return area_total
 
 
 def regra_simpson_repetida(h: float, y: list) -> float:
-    pass
+    intervalos = len(y) - 1
 
+    if (h <= 0 or intervalos < 2 or intervalos % 2 != 0):
+        raise ValueError("Informe um passo positivo e um número par de intervalos (mínimo de 2).")
+
+    area_total = 0.0
+
+    # Cada grupo de três pontos corresponde a dois intervalos
+    for i in range(0, intervalos, 2):
+        area_trecho = (y[i] + 4 * y[i + 1] + y[i + 2]) * h / 3
+        area_total = area_total + area_trecho
+
+    return area_total
 
 def menu_questao_01_3():
     pass
@@ -145,8 +166,46 @@ def menu_questao_02_3():
 
 
 def menu_questao_04_2():
-    pass
+    print("\nIntegração Numérica")
+    print("1 - Usar os dados do rio (questão 04.2)")
+    print("2 - Informar outra tabela de pontos")
+    print("0 - Voltar ao menu principal")
 
+    opcao = input("Escolha uma opção: ").strip()
+
+    if opcao == "0":
+        return
+    elif opcao == "1":
+        x, m1, m2, y, h = dados_questao_04_2()
+    elif opcao == "2":
+        # O passo h é a distância entre dois pontos consecutivos da tabela.
+        try:
+            texto_h = input("Digite o passo h (por exemplo, 0.5): ")
+            h = float(texto_h)
+            texto_y = input("Digite os valores de y separados: ")
+            partes = texto_y.split()
+
+            y = []
+            for parte in partes:
+                numero = float(parte)
+                y.append(numero)
+        
+        except ValueError:
+            print("Digite números válidos. Use ponto nos decimais e separe os valores de y")
+            return
+            
+    else:
+        print("Opção inválida. Escolha 0, 1 ou 2.")
+        return
+
+    try:
+        area_trapezio = regra_trapezio_repetida(h, y)
+        print("Integral pelo trapézio:", area_trapezio)
+
+        area_simpson = regra_simpson_repetida(h, y)
+        print("Integral por Simpson 1/3:", area_simpson)
+    except ValueError as erro:
+        print(erro)
 
 # ==============================================================================
 # 3ª PARTE: INTERPOLAÇÃO POLINOMIAL - QUESTÃO 03.2 COMPLETA (Eduardo dos Santos)
