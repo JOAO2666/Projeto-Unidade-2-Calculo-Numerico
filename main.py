@@ -157,13 +157,104 @@ def regra_simpson_repetida(h: float, y: list) -> float:
 
     return area_total
 
-def menu_questao_01_3():
-    pass
+def ler_linha(mensagem: str, quantidade: int) -> list:
+    texto = input(mensagem)
+    partes = texto.split()
 
+    #Cada equação precisa de um coeficiente apra cada incognita
+    if len(partes) != quantidade:
+        raise ValueError(f"Digite exatamente {quantidade} números separados por espaços.")
+
+    linha = []
+    for parte in partes:
+        numero = float(parte)
+        linha.append(numero)
+
+    return linha
+
+def ler_sistema():
+    texto = input("Quantas incógnitas tem o sistema? ")
+    ordem = int(texto)
+
+    if ordem < 1:
+        raise ValueError("A ordem do sistema deve ser pelo menos 1.")
+
+    # Cada linha da matriz A contém os coeficientes de uma equação.
+    A = []
+    for i in range(ordem):
+        linha = ler_linha(f"Coeficientes da equação {i + 1}: ", ordem)
+        A.append(linha)
+
+    b = ler_linha("Termos independentes, na ordem das equações: ", ordem)
+    return A, b
+
+def menu_questao_01_3():
+    print("\nEliminação de Gauss")
+    print("1 - Usar os dados das minas (questão 01.3)")
+    print("2 - Informar outro sistema linear")
+    print("0 - Voltar ao menu principal")
+
+    opcao = input("Escolha uma opção: ").strip()
+    if opcao == "0":
+        return
+
+    try:
+        if opcao == "1":
+            A, b = dados_questao_01_3()
+        elif opcao == "2":
+            A, b = ler_sistema()
+        else:
+            print("Opção inválida. Escolha 0, 1 ou 2.")
+            return
+
+        solucao = eliminacao_gauss(A, b)
+    except ValueError as erro:
+        print(erro)
+        return
+
+    for i in range(len(solucao)):
+        if opcao == "1":
+            print(f"Mina {i + 1}: {solucao[i]:.2f} m³")
+        else:
+            print(f"x{i + 1} = {solucao[i]}")
 
 def menu_questao_02_3():
-    pass
+    print("\nMétodo de Gauss-Seidel")
+    print("1 - Usar os dados do circuito (questão 02.3)")
+    print("2 - Informar outro sistema linear")
+    print("0 - Voltar ao menu principal")
 
+    opcao = input("Escolha uma opção: ").strip()
+
+    if opcao == "0":
+        return
+
+    try:
+        if opcao == "1":
+            A, b, tol = dados_questao_02_3()
+        elif opcao == "2":
+            A, b = ler_sistema()
+            tol = float(input("Digite a tolerância (por exemplo, 0.0001): "))
+            if tol <= 0:
+                raise ValueError("A tolerância deve ser positiva.")
+        else:
+            print("Opção inválida. Escolha 0, 1 ou 2.")
+            return
+
+        # Os dois caminhos usam o mesmo método de cálculo.
+        resultado = gauss_seidel(A, b, tol)
+    except ValueError as erro:
+        print(erro)
+        return
+    if resultado["convergiu"]:
+        solucao = resultado["solucao"]
+        for i in range(len(solucao)):
+            if opcao == "1":
+                print(f"I{i + 1} = {solucao[i]:.4f} A")
+            else:
+                print(f"x{i + 1} = {solucao[i]:.4f}")
+    else:
+        print("O método atingiu o limite de iterações sem convergir.")
 
 def menu_questao_04_2():
     print("\nIntegração Numérica")
