@@ -327,6 +327,7 @@ def selecionar_pontos_proximos(x_todos: list, y_todos: list, x_alvo: float, grau
 def interpolacao_lagrange(x_base: list, y_base: list, x_alvo: float) -> float:
     n = len(x_base)
     y_resultado = 0.0
+
     for i in range(n):
         L = 1.0    
         for j in range(n):
@@ -355,7 +356,7 @@ def interpolacao_newton(x_base: list, y_base: list, x_alvo: float) -> float:
                 denominador = x_base[i] - x_base[i - j]
                 b[i] = numerador/denominador
             
-            produtorio_x = y_base[0] + b[j] * (x_alvo - x_base[j - 1])
+            produtorio_x = produtorio_x * (x_alvo - x_base[j - 1])
             resultado = resultado + (produtorio_x * b[j])
 
         return resultado
