@@ -305,17 +305,42 @@ def menu_questao_04_2():
 def selecionar_pontos_proximos(x_todos: list, y_todos: list, x_alvo: float, grau: int):
     pass
 
-
 def interpolacao_lagrange(x_base: list, y_base: list, x_alvo: float) -> float:
-    pass
+    n = len(x_base)
+    y_resultado = 0.0
+    for i in range(n):
+        L = 1.0    
+        for j in range(n):
+            if i != j:
+                numerador = x_alvo - x_base[j]
+                denominador = x_base[i] - x_base[j]
+                L = L * (numerador/denominador)
 
+        y_resultado = y_resultado + (y_base[i] * L)    
+        
+    return y_resultado
 
 def interpolacao_newton(x_base: list, y_base: list, x_alvo: float) -> float:
     pass
 
 
 def menu_questao_03_2():
-    pass
+    grau = int(input("Defina o Grau do Polinomio: "))
+    total_pontos = int(input("Define o total de pontos do Polinomio: "))
+    x_alvo = float(input("Defina o Ponto que vai ser Alvo dentro da Função: "))
+    lista_x = []
+    lista_y = []
+
+    for i in range(total_pontos):
+        numero_x = float(input("Digite um número para a coordenada 'x': "))
+        lista_x.append(numero_x)
+    
+    for j in range(total_pontos):
+        numero_y = float(input("Digite um número para a coordenada 'y': "))
+        lista_y.append(numero_y)
+
+    selecionar_pontos_proximos(lista_x, lista_y, x_alvo, grau)
+
 
 
 # ==============================================================================
