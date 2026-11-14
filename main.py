@@ -303,8 +303,27 @@ def menu_questao_04_2():
 # ==============================================================================
 
 def selecionar_pontos_proximos(x_todos: list, y_todos: list, x_alvo: float, grau: int):
-    pass
+    n = len(x_todos)
 
+    x = x_todos[:]
+    y = y_todos[:]
+
+    for i in range(n - 1):  
+        for j in range(n - i - 1):
+            if abs(x[j] - x_alvo) > abs(x[j + 1] - x_alvo):
+                aux = x[j]
+                x[j] = x[j + 1]
+                x[j + 1] = aux 
+
+                aux_y = y[j]
+                y[j] = y[j + 1]
+                y[j + 1] = aux_y
+
+
+    x_base = x[:grau + 1]
+    y_base = y[:grau + 1]
+
+    return x_base, y_base
 def interpolacao_lagrange(x_base: list, y_base: list, x_alvo: float) -> float:
     n = len(x_base)
     y_resultado = 0.0
@@ -321,27 +340,84 @@ def interpolacao_lagrange(x_base: list, y_base: list, x_alvo: float) -> float:
     return y_resultado
 
 def interpolacao_newton(x_base: list, y_base: list, x_alvo: float) -> float:
-    pass
+    n = len(x_base)
+
+    if n == 1:
+        return y_base[0]
+    elif n > 1:
+        b = y_base[:]
+        resultado = y_base[0]
+        produtorio_x = 1.0
+
+        for j in range(1 , n):
+            for i in range(n - 1, j - 1, -1):
+                numerador = b[i] - b[i - 1]
+                denominador = x_base[i] - x_base[i - j]
+                b[i] = numerador/denominador
+            
+            produtorio_x = y_base[0] + b[j] * (x_alvo - x_base[j - 1])
+            resultado = resultado + (produtorio_x * b[j])
+
+        return resultado
 
 
 def menu_questao_03_2():
-    grau = int(input("Defina o Grau do Polinomio: "))
-    total_pontos = int(input("Define o total de pontos do Polinomio: "))
-    x_alvo = float(input("Defina o Ponto que vai ser Alvo dentro da Função: "))
-    lista_x = []
-    lista_y = []
+    print("\nInterpolação Polinomial (Lagrange e Newton)")
+    print("1 - Usar os dados do resistor (questão 03.2)")
+    print("2 - Informar outra tabela de pontos manualmente")
+    print("0 - Voltar ao menu principal")
 
-    for i in range(total_pontos):
-        numero_x = float(input("Digite um número para a coordenada 'x': "))
-        lista_x.append(numero_x)
-    
-    for j in range(total_pontos):
-        numero_y = float(input("Digite um número para a coordenada 'y': "))
-        lista_y.append(numero_y)
+    escolha_inicial = input("Escolha uma opção: ").strip()
+    if escolha_inicial == "0":
+        return
 
-    selecionar_pontos_proximos(lista_x, lista_y, x_alvo, grau)
+    if escolha_inicial == "1":
+        lista_x, lista_y, x_alvo = dados_questao_03_2()
+        for grau in [2, 3, 4]:
+            x_base, y_base = selecionar_pontos_proximos(lista_x, lista_y, x_alvo, grau)
+            res_lag = interpolacao_lagrange(x_base, y_base, x_alvo)
+            res_new = interpolacao_newton(x_base, y_base, x_alvo)
+            print(f"\n--- Grau {grau} (Pontos i usados: {x_base}) ---")
+            print(f"Lagrange: V({x_alvo}) = {res_lag:.4f} V")
+            print(f"Newton:   V({x_alvo}) = {res_new:.4f} V")
 
+    elif escolha_inicial == "2":
+        grau = int(input("Defina o Grau do Polinomio: "))
+        total_pontos = int(input("Defina o total de pontos da tabela: "))
+        
+        if total_pontos < grau + 1:
+            print(f"Erro: São necessários pelo menos {grau + 1} pontos.")
+            return
 
+        x_alvo = float(input("Defina o Ponto que vai ser Alvo dentro da Função: "))
+        lista_x = []
+        lista_y = []
+
+        for i in range(total_pontos):
+            numero_x = float(input(f"Digite o {i + 1}º número para a coordenada 'x': "))
+            lista_x.append(numero_x)
+        
+        for j in range(total_pontos):
+            numero_y = float(input(f"Digite o {j + 1}º número para a coordenada 'y': "))
+            lista_y.append(numero_y)
+
+        x_base, y_base = selecionar_pontos_proximos(lista_x, lista_y, x_alvo, grau)
+
+        print("\nMENU DO MÉTODO DE INTERPOLAÇÃO")
+        print("1. INTERPOLAÇÃO POLINOMIAL - MÉTODO DE LAGRANGE")
+        print("2. INTERPOLAÇÃO POLINOMIAL - MÉTODO DE NEWTON")
+        opcao = int(input("ESCOLHA: "))
+
+        if opcao == 1:
+            res = interpolacao_lagrange(x_base, y_base, x_alvo)
+            print(f"Resultado por Lagrange: {res:.4f}")
+        elif opcao == 2:
+            res = interpolacao_newton(x_base, y_base, x_alvo)
+            print(f"Resultado por Newton: {res:.4f}")
+        else:
+            print("Opção inválida!")
+    else:
+        print("Opção inválida. Escolha 0, 1 ou 2.")
 
 # ==============================================================================
 # MENU PRINCIPAL
